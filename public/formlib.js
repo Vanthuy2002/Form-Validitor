@@ -1,20 +1,41 @@
-function Validitor(){
-
+function Validator(option){
+    let formElement= document.querySelector(option.form);
+    if(formElement){
+        option.rules.forEach((rule)=>{
+            let inputElement = formElement.querySelector(rule.selector);
+            if(inputElement){
+                inputElement.onblur = ()=>{
+                 
+                }
+            }
+        });
+    }
 }
 
 //Defined rules
-Validitor.isReqiured = function(){
+Validator.isReqiured = function(selector){
+    return {
+        selector, 
+        test(){
+
+        }
+    }
 
 }
-Validitor.isEmail = function(){
-
+Validator.isEmail = function(selector){
+    return {
+        selector, 
+        test(){
+            
+        }
+    }
 }
 
 //My hope
-Validitor({
+Validator({
     form: "#form-1",
     rules : [
-        Validitor.isReqiured("#fullName"),
-        Validitor.isEmail("#email"),
+        Validator.isReqiured("#fullname"),
+        Validator.isEmail("#email"),
     ]
 });
