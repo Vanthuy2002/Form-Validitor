@@ -61,17 +61,23 @@ Validator.isEmail = function (selector) {
 };
 
 Validator.minLength = function (selector, min) {
-    return {
-      selector,
-      test(value) {
-        return value.length >= min ? undefined : "Enter at least " + min+ " characters";
-      },
-    };
+  return {
+    selector,
+    test(value) {
+      return value.length >= min
+        ? undefined
+        : "Enter at least " + min + " characters";
+    },
   };
+};
 
 //My hope
 Validator({
   form: "#form-1",
   error: ".form-message",
-  rules: [Validator.isReqiured("#fullname"), Validator.isEmail("#email"), Validator.minLength("#password", 6)],
+  rules: [
+    Validator.isReqiured("#fullname"),
+    Validator.isEmail("#email"),
+    Validator.minLength("#password", 6),
+  ],
 });
