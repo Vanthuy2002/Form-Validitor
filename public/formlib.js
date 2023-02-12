@@ -1,7 +1,18 @@
 function Validator(option) {
+  let selectorRules = {};
+
   //Ham thuc thi validate
   function validate(inputElement, rule) {
-    let errorMess = rule.test(inputElement.value);
+    let errorMess;
+    //Lấy ra hàm test theo selector tương ứng
+    let rules = selectorRules[rule.selector];
+
+    //Lặp qua từng rules, nếu có lỗi thì break (dừng kiểm tra)
+    //Nếu isReqiued("#email") mà bắn ra mess báo lỗi, thì isEmail("#email") sẽ không được thực thi
+    for (let i = 0; i < rules.length; i++) {
+      errorMess = rules[i](inputElement.value);
+      if (errorMess) break;
+    }
     let errorElement = inputElement.parentElement.querySelector(option.error);
     if (errorMess) {
       errorElement.innerText = errorMess;
@@ -10,11 +21,54 @@ function Validator(option) {
       errorElement.innerText = "";
       inputElement.parentElement.classList.remove("invalid");
     }
+
+    return !errorMess;
   }
   //Get element of form need validate
   let formElement = document.querySelector(option.form);
+  //submit form
+  if (formElement) {
+    formElement.onsubmit = (e) => {
+      e.preventDefault();
+
+      let isFormValid = true;
+
+      //Lap qua tung rules va validate
+      option.rules.forEach((rule) => {
+        let inputElement = formElement.querySelector(rule.selector);
+        let valid = validate(inputElement, rule);
+        if (!valid) {
+          isFormValid = false;
+        }
+      });
+      
+      
+      if (isFormValid) {
+        if(typeof option.onSubmit === "function"){
+          let enableInputs = formElement.querySelectorAll("[name]:not([disable])");
+    
+          let formValue = Array.from(enableInputs);
+          let resultsForm = formValue.reduce((values, input)=>{
+            values[input.name] = input.value
+            return values;
+            }, {});
+            localStorage.setItem("user", JSON.stringify(resultsForm));
+            option.onSubmit(resultsForm);
+          }
+      }
+    };
+  }
+
+  //Xử lý form
   if (formElement) {
     option.rules.forEach((rule) => {
+      //luu lai rules cho moi input
+      if (Array.isArray(selectorRules[rule.selector])) {
+        selectorRules[rule.selector].push(rule.test);
+      } else {
+        selectorRules[rule.selector] = [rule.test];
+      }
+
       let inputElement = formElement.querySelector(rule.selector);
       if (inputElement) {
         //Xử lý khi blur ra ngoài
@@ -44,7 +98,7 @@ Validator.isReqiured = function (selector, msg) {
     test(value) {
       return value.trim()
         ? undefined
-        :msg ||"Well, have something is not funny, please try again";
+        : msg || "Well, have something is not funny, please try again";
     },
   };
 };
@@ -55,7 +109,7 @@ Validator.isEmail = function (selector, msg) {
       let regex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
       return regex.test(value)
         ? undefined
-        : msg ||"Well, have something is not a email, please try again";
+        : msg || "Well, have something is not a email, please try again";
     },
   };
 };
@@ -88,10 +142,31 @@ Validator({
   error: ".form-message",
   rules: [
     Validator.isReqiured("#fullname"),
-    Validator.isEmail("#email", "Vui lòng nhập email"),
+    Validator.isReqiured("#email", "Vui lòng nhập trường này"),
+    Validator.isEmail("#email", "Vui lòng nhập định dạng email"),
     Validator.minLength("#password", 6),
-    Validator.isConfirm("#password_confirmation", () => {
-      return document.querySelector("#form-1 #password").value;
-    }, "Mật khẩu nhập lại không đúng"),
+    Validator.isReqiured("#password_confirmation"),
+    Validator.isConfirm(
+      "#password_confirmation",
+      () => {
+        return document.querySelector("#form-1 #password").value;
+      },
+      "Mật khẩu nhập lại không đúng"
+    ),
   ],
+  onSubmit(data) {
+    //Call API để gửi (POST) về database
+    fetch("http://localhost:3000/user",  
+    { method: 'POST',
+      headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(data)})
+    .then((reponse)=>{
+      return reponse.json();
+    })
+    .then((data)=>{
+      console.log("success" ,data);
+    })
+  },
 });
