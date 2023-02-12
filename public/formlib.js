@@ -38,24 +38,24 @@ function Validator(option) {
 //Nguyên tắc của rule
 //1. When has a error , then return mess
 //2. When pass, return nothing
-Validator.isReqiured = function (selector) {
+Validator.isReqiured = function (selector, msg) {
   return {
     selector,
     test(value) {
       return value.trim()
         ? undefined
-        : "Well, have something is not funny, please try again";
+        :msg ||"Well, have something is not funny, please try again";
     },
   };
 };
-Validator.isEmail = function (selector) {
+Validator.isEmail = function (selector, msg) {
   return {
     selector,
     test(value) {
       let regex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
       return regex.test(value)
         ? undefined
-        : "Well, have something is not a email, please try again";
+        : msg ||"Well, have something is not a email, please try again";
     },
   };
 };
@@ -71,13 +71,27 @@ Validator.minLength = function (selector, min) {
   };
 };
 
+Validator.isConfirm = function (selector, getConfirmValue, msg) {
+  return {
+    selector,
+    test(value) {
+      return value === getConfirmValue()
+        ? undefined
+        : msg || "Input data is incorrect, please try again";
+    },
+  };
+};
+
 //My hope
 Validator({
   form: "#form-1",
   error: ".form-message",
   rules: [
     Validator.isReqiured("#fullname"),
-    Validator.isEmail("#email"),
+    Validator.isEmail("#email", "Vui lòng nhập email"),
     Validator.minLength("#password", 6),
+    Validator.isConfirm("#password_confirmation", () => {
+      return document.querySelector("#form-1 #password").value;
+    }, "Mật khẩu nhập lại không đúng"),
   ],
 });
