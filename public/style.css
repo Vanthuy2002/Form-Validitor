@@ -123,3 +123,17 @@ html {
 .spacer {
   margin-top: 36px;
 }
+
+.radio-flex {
+  display: flex;
+  flex-direction: row-reverse;
+  justify-content: left;
+  align-items: center;
+}
+.radio-flex label {
+  font-size: 1.4rem;
+  margin-left: 1rem;
+}
+input[type="radio"] {
+  font-size: 2rem;
+}
