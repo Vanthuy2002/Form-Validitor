@@ -189,20 +189,20 @@ Validator({
   error: ".form-message",
   parentValue: ".form-group",
   rules: [
-    // Validator.isReqiured("#fullname"),
-    // Validator.isReqiured("#email", "Vui lòng nhập trường này"),
-    // Validator.isEmail("#email", "Vui lòng nhập định dạng email"),
-    // Validator.minLength("#password", 4),
-    // Validator.isReqiured("#password_confirmation"),
-    // Validator.isReqiured("input[type='checkbox']"),
+    Validator.isReqiured("#fullname"),
+    Validator.isReqiured("#email", "Vui lòng nhập trường này"),
+    Validator.isEmail("#email", "Vui lòng nhập định dạng email"),
+    Validator.minLength("#password", 4),
+    Validator.isReqiured("#password_confirmation"),
+    Validator.isReqiured("input[type='checkbox']"),
     Validator.isReqiured("#img"),
-    // Validator.isConfirm(
-    //   "#password_confirmation",
-    //   () => {
-    //     return document.querySelector("#form-1 #password").value;
-    //   },
-    //   "Mật khẩu nhập lại không đúng"
-    // ),
+    Validator.isConfirm(
+      "#password_confirmation",
+      () => {
+        return document.querySelector("#form-1 #password").value;
+      },
+      "Mật khẩu nhập lại không đúng"
+    ),
   ],
   onSubmit(data) {
     //Call API để gửi (POST) về database
